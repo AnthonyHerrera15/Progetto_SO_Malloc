@@ -19,7 +19,7 @@ void bitmap_set(Bitmap* bitmap, int bit_num, int value){
     }
     int byte_index = bit_num/8;     //indice del byte dentro il buffer
     int bit_index = bit_num%8;      //indice del bit dentro il byte
-    if(value==1) {
+    if(value) {
         bitmap->bits[byte_index] |= (1 << bit_index);   //imposto il bit richiesto a 1
     } else {
         bitmap->bits[byte_index] &= ~(1 << bit_index);  //imposto il bit richiesto a 0
@@ -33,7 +33,7 @@ int bitmap_get(Bitmap* bitmap, int bit_num){
     }
     int byte_index = bit_num/8;     //indice del byte dentro il buffer
     int bit_index = bit_num%8;      //indice del bit dentro il byte
-    int ris = (bitmap->bits[byte_index]) & (1 << bit_index)!=0; //restituisco il valore del bit richiesto
+    int ris = (bitmap->bits[byte_index] & (1 << bit_index))!=0; //restituisco il valore del bit richiesto
     return ris;
 }
 
@@ -45,9 +45,9 @@ void bitmap_print(Bitmap* bitmap) {
     printf("Bitmap: ");
     for(int i=0; i<bitmap->n_bits; i++) {
         if(i % 8 == 0 && i != 0) {
-            printf(" ");
+            printf("  ");
         }
-        printf("%d", bitmap_get(bitmap, i));
+        printf("%d",bitmap_get(bitmap, i));
     }
     printf("\n");
 }
