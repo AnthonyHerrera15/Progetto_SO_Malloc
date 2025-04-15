@@ -14,7 +14,7 @@ void bitmap_init(Bitmap* bitmap, int n_bits, char* buffer) {
 
 void bitmap_set(Bitmap* bitmap, int bit_num, int value){
     if(bit_num<0 || bit_num >= bitmap->n_bits) {    //controllo che il bit_num sia valido
-        printf("ERRORE: indice del bit non valido,fuori dal bitmap\n");
+        printf("ERRORE(set in %d): indice del bit non valido,fuori dal bitmap\n",bit_num);
         return;  
     }
     int byte_index = bit_num/8;     //indice del byte dentro il buffer
@@ -28,7 +28,7 @@ void bitmap_set(Bitmap* bitmap, int bit_num, int value){
 
 int bitmap_get(Bitmap* bitmap, int bit_num){
     if(bit_num<0 || bit_num >= bitmap->n_bits) {    //controllo che il bit_num sia valido
-        printf("ERRORE: indice del bit non valido,fuori dal bitmap\n");
+        printf("ERRORE(get in %d): indice del bit non valido,fuori dal bitmap\n",bit_num);
         return -1;  
     }
     int byte_index = bit_num/8;     //indice del byte dentro il buffer
