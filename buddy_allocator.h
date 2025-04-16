@@ -1,6 +1,8 @@
 #pragma once
 #include "bitmap.c"
 
+#define MAX_LEVELS 16
+
 typedef struct{
     char* memory;           //puntatore alla memoria
     int memory_size;        //dimensione della memoria gestita
@@ -10,7 +12,7 @@ typedef struct{
 } BuddyAllocator;
 
 // funzione che inizializza un BuddyAllocator ed effettua il setup della bitmap
-void buddy_allocator_init(BuddyAllocator* allocator, char* memory, int memory_size, int min_bucket_size, char* bm_buffer, int bm_size);
+void buddy_allocator_init(BuddyAllocator* allocator, char* memory, int mem_size, int min_bucket_size, char* bm_buffer, int bm_size);
 
 // funzione che alloca la memoria richiesta
 void buddy_allocator_malloc(BuddyAllocator* allocator, int size);
