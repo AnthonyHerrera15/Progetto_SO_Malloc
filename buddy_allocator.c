@@ -26,7 +26,7 @@ int first_in_level(int level){
 // trova l'indice del nodo idx all'interno del livello
 int offset_in_level(int level, int idx){
     return (idx - first_in_level(level));
-}
+}                                           //ALLA FINE NON L'HO USATA
 
 void buddy_allocator_init(BuddyAllocator* allocator, char* memory, int mem_size, int min_bucket_size, char* bm_buffer, int bm_size) {
     // controllo se i parametri sono validi
@@ -163,4 +163,16 @@ void buddy_allocator_free(BuddyAllocator* allocator, void* ptr){
     )
 
     printf("Deallocato con successo il blocco di memoria con indice %d\n", (*block_addr));
+}
+
+void buddy_allocator_print(BuddyAllocator* allocator) {
+    if (!allocator || !allocator->memory) {
+        printf("BuddyAllocator non inizializzato\n");
+        return;
+    }
+    printf("BuddyAllocator: \n");
+    printf("Memory size: %d\n", allocator->memory_size);
+    printf("Min bucket size: %d\n", allocator->min_bucket_size);
+    printf("Num levels: %d\n", allocator->num_levels);
+    bitmap_print(&allocator->bitmap);
 }

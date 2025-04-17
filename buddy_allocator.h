@@ -19,3 +19,13 @@ void buddy_allocator_malloc(BuddyAllocator* allocator, int size);
 
 // funzione che libera la memoria allocata
 void buddy_allocator_free(BuddyAllocator* allocator, void* ptr);
+
+//funzioni ausiliari (prese dalle slides)
+int buddyIdx(int idx);
+int parentIdx(int idx);
+int first_in_level(int level);
+
+//funzioni ausiliari bitmap
+void aggiorno_parenti(Bitmap* bitmap, int idx, int status);
+void aggiorno_figli(Bitmap* bitmap, int idx, int status);
+
