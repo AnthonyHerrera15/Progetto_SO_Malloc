@@ -90,7 +90,7 @@ void buddy_allocator_malloc(BuddyAllocator* allocator, int size) {
         return;
     }
 
-    // aggiungo la lo spazio per il buddy block header dove memorizzo l'indice del blocco
+    // aggiungo lo spazio per il buddy block header dove memorizzo l'indice del blocco
     size+=sizeof(int); 
 
     // calcolo il livello necessario per la richiesta di memoria
@@ -126,4 +126,41 @@ void buddy_allocator_malloc(BuddyAllocator* allocator, int size) {
     // nessun blocco di memoria libero trovato
     printf("ERRORE: memoria esaurita\n");
     return NULL; 
+}
+
+void buddy_allocator_free(BuddyAllocator* allocator, void* ptr){
+    // controllo se i parametri sono validi
+    if (!allocator || !allocator->memory || !ptr) {
+        printf("Parametri non validi per la free\n");
+        return;
+    }
+    
+    // calcolo l'indirizzo del blocco di memoria e prendo l'indice nell'header
+    int* block_addr = (int*)(ptr - sizeof(int));
+    int idx = *block_addr;
+
+    // controllo se l'indice è valido
+    if(idx < 0 || idx >= allocator->bitmap.n_bits) {
+        printf("ERRORE: indice del blocco di memoria non valido\n");
+        return;
+    }
+
+    // controllo se il blocco di memoria è già libero
+    if (bitmap_get(&allocator->bitmap, idx) == 0) { 
+        printf("ERRORE: blocco di memoria già libero\n");
+        return;
+    }
+    
+    // segnalo il nodo e i suoi figli come liberi
+    aggiorna_figli(&allocator->bitmap, idx, 0); //segnalo il blocco di memoria come libero
+
+    // provo a fare il merging con il buddy
+    int buddy = buddyIdx(idx);
+    while(bitmap_get(&allocator->bitmap, buddy) == 0 && idx!=-1) (
+        idx = parentIdx(idx);
+        bitmap_set(&allocator->bitmap, idx, 0);
+        buddy = buddyIdx(idx);          //calcolo il buddy del padre
+    )
+
+    printf("Deallocato con successo il blocco di memoria con indice %d\n", (*block_addr));
 }

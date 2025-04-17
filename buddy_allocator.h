@@ -16,3 +16,6 @@ void buddy_allocator_init(BuddyAllocator* allocator, char* memory, int mem_size,
 
 // funzione che alloca la memoria richiesta
 void buddy_allocator_malloc(BuddyAllocator* allocator, int size);
+
+// funzione che libera la memoria allocata
+void buddy_allocator_free(BuddyAllocator* allocator, void* ptr);
