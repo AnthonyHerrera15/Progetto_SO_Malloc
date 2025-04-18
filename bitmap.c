@@ -1,4 +1,6 @@
 #include "bitmap.h"
+#include <stdio.h>
+#include <math.h>
 
 int bitmap_getBytes(int n_bits) {
     return (n_bits/8) + ((n_bits % 8)!=0);
@@ -14,7 +16,7 @@ void bitmap_init(Bitmap* bitmap, int n_bits, char* buffer) {
 
 void bitmap_set(Bitmap* bitmap, int bit_num, int value){
     if(bit_num<0 || bit_num >= bitmap->n_bits) {    //controllo che il bit_num sia valido
-        printf("ERRORE(set in %d): indice del bit non valido,fuori dal bitmap\n",bit_num);
+        printf("ERRORE(set in %d): indice del bit non valido\n",bit_num);
         return;  
     }
     int byte_index = bit_num/8;     //indice del byte dentro il buffer
@@ -28,7 +30,7 @@ void bitmap_set(Bitmap* bitmap, int bit_num, int value){
 
 int bitmap_get(Bitmap* bitmap, int bit_num){
     if(bit_num<0 || bit_num >= bitmap->n_bits) {    //controllo che il bit_num sia valido
-        printf("ERRORE(get in %d): indice del bit non valido,fuori dal bitmap\n",bit_num);
+        printf("ERRORE(get in %d): indice del bit non valido\n",bit_num);
         return -1;  
     }
     int byte_index = bit_num/8;     //indice del byte dentro il buffer
@@ -43,11 +45,17 @@ void bitmap_print(Bitmap* bitmap) {
         return;
     }
     printf("Bitmap: ");
+    int p2 = 0;
+    int cont = 0;
     for(int i=0; i<bitmap->n_bits; i++) {
-        if(i % 8 == 0 && i != 0) {
-            printf("  ");
+        
+        if(cont == 1<<p2) {
+            printf(" ");
+            p2 ++;
+            cont = 0;
         }
         printf("%d",bitmap_get(bitmap, i));
+        cont++;
     }
     printf("\n");
 }

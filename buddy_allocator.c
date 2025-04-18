@@ -1,8 +1,14 @@
 #include "buddy_allocator.h"
+#include <math.h>
+#include <stdio.h>
 
 // trova il livello del nodo idx
-int levelIdx(int idx){
-    return (int)floor(log2(idx+1));
+int levelIdx(int idx) {
+    int level = 0;
+    while ((1 << level) - 1 <= idx) {
+        level++;
+    }
+    return level - 1;
 }
 
 // trova l'indice del buddy del nodo idx
@@ -36,18 +42,18 @@ void buddy_allocator_init(BuddyAllocator* allocator, char* memory, int mem_size,
     }
 
     int test_mem_size=1;
-    while(test_mem_size<<1 < mem_size){         //trovo la potenza di 2 più vicina a mem_size
+    while(test_mem_size<<1 <= mem_size){         //trovo la potenza di 2 più vicina a mem_size
         test_mem_size<<=1;
     }
 
     int test_minb_size=1;
-    while(test_minb_size<<1 < min_bucket_size){  //trovo la potenza di 2 più vicina a min_bucket_size
+    while(test_minb_size<<1 <= min_bucket_size){  //trovo la potenza di 2 più vicina a min_bucket_size
         test_minb_size<<=1;
     }
     
     int levels = 0;
     int size = test_mem_size;
-    while(size >= test_minb_size) {              // ?? (controllare se esce il numero di livelli giusto)
+    while(size >= test_minb_size) {             
         size >>= 1;
         levels++;
     }
@@ -78,20 +84,23 @@ void aggiorno_parenti(Bitmap* bitmap, int idx, int status){
 }
 
 void aggiorno_figli(Bitmap* bitmap, int idx, int status){
-    bitmap_set(bitmap, idx, status);            //segnalo il nodo come occupato o libero
-    aggiorna_figli(bitmap, (2*idx)+1, status);    //segnalo il figlio sinistro
-    aggiorno_figli(bitmap, (2*idx)+2, status);    //segnalo il figlio destro
+    if(idx <= bitmap->n_bits-1){              
+        bitmap_set(bitmap, idx, status);            //segnalo il nodo come occupato o libero
+        aggiorno_figli(bitmap, (2*idx)+1, status);    //segnalo il figlio sinistro
+        aggiorno_figli(bitmap, (2*idx)+2, status);    //segnalo il figlio destro
+    }
 }
 
-void buddy_allocator_malloc(BuddyAllocator* allocator, int size) {
+void* buddy_allocator_malloc(BuddyAllocator* allocator, int size) {
     // controllo se i parametri sono validi
     if (!allocator || !allocator->memory || size <= 0 || size > allocator->memory_size) {
         printf("Parametri non validi per la malloc\n");
-        return;
+        return NULL;
     }
 
     // aggiungo lo spazio per il buddy block header dove memorizzo l'indice del blocco
     size+=sizeof(int); 
+    printf("\nRichiesta di %d byte\n", size);
 
     // calcolo il livello necessario per la richiesta di memoria
     int level = allocator->num_levels - 1;
@@ -100,25 +109,25 @@ void buddy_allocator_malloc(BuddyAllocator* allocator, int size) {
         bucket_size <<= 1;                  // del blocco di memoria raddoppio la dimensione del blocco e 
         level--;                            // decremento di un livello e riprovo 
     }
-
     // cerco il primo blocco di memoria libero
     int idx = first_in_level(level);
-    while (idx < allocator->bitmap.n_bits) {
+    
+    while (idx >=0 && idx < first_in_level(level + 1)) { //fino a quando non arrivo alla fine del livello
+        
         if (bitmap_get(&allocator->bitmap, idx) == 0) {     //se il blocco è libero
-
             //propago l'aggiornamento fino alla radice
-            aggiorna_parenti(allocator->bitmap, idx, 1);
-
+            aggiorno_parenti(&allocator->bitmap, idx, 1);
+            
             //propago l'aggiornamento ai nodi figli
-            aggiorna_figli(allocator->bitmap, idx, 1);
-
+            aggiorno_figli(&allocator->bitmap, idx, 1);
+            
             // calcolo l'indirizzo del blocco di memoria
             int* block_addr = (int*)(allocator->memory + (idx - first_in_level(level)) * bucket_size);
             *block_addr = idx; // memorizzo l'indice del blocco di memoria
 
-            printf("Allocato %d bit a livello %d, indice %d\n", bucket_size, level, idx);
+            printf("Allocato %d byte a livello %d, indice %d\n", bucket_size, level, idx);
 
-            return (void*)block_addr + sizeof(int); // restituisco l'indirizzo del blocco di memoria
+            return (void*)(block_addr + sizeof(int)); // restituisco l'indirizzo del blocco di memoria
         }
         idx++;
     }
@@ -136,7 +145,7 @@ void buddy_allocator_free(BuddyAllocator* allocator, void* ptr){
     }
     
     // calcolo l'indirizzo del blocco di memoria e prendo l'indice nell'header
-    int* block_addr = (int*)(ptr - sizeof(int));
+    int* block_addr = ((int*)ptr-sizeof(int));
     int idx = *block_addr;
 
     // controllo se l'indice è valido
@@ -152,16 +161,15 @@ void buddy_allocator_free(BuddyAllocator* allocator, void* ptr){
     }
     
     // segnalo il nodo e i suoi figli come liberi
-    aggiorna_figli(&allocator->bitmap, idx, 0); //segnalo il blocco di memoria come libero
+    aggiorno_figli(&allocator->bitmap, idx, 0); //segnalo il blocco di memoria come libero
 
     // provo a fare il merging con il buddy
     int buddy = buddyIdx(idx);
-    while(bitmap_get(&allocator->bitmap, buddy) == 0 && idx!=-1) (
+    while(bitmap_get(&allocator->bitmap, buddy) == 0 && idx>0) {
         idx = parentIdx(idx);
         bitmap_set(&allocator->bitmap, idx, 0);
         buddy = buddyIdx(idx);          //calcolo il buddy del padre
-    )
-
+    }
     printf("Deallocato con successo il blocco di memoria con indice %d\n", (*block_addr));
 }
 

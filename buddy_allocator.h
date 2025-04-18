@@ -1,7 +1,7 @@
 #pragma once
 #include "bitmap.c"
 
-#define MAX_LEVELS 16
+#define MAX_LEVELS 10
 
 typedef struct{
     char* memory;           //puntatore alla memoria
@@ -15,7 +15,7 @@ typedef struct{
 void buddy_allocator_init(BuddyAllocator* allocator, char* memory, int mem_size, int min_bucket_size, char* bm_buffer, int bm_size);
 
 // funzione che alloca la memoria richiesta
-void buddy_allocator_malloc(BuddyAllocator* allocator, int size);
+void* buddy_allocator_malloc(BuddyAllocator* allocator, int size);
 
 // funzione che libera la memoria allocata
 void buddy_allocator_free(BuddyAllocator* allocator, void* ptr);
