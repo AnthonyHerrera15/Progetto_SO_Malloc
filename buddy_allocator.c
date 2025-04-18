@@ -92,6 +92,7 @@ void aggiorno_figli(Bitmap* bitmap, int idx, int status){
 }
 
 void* buddy_allocator_malloc(BuddyAllocator* allocator, int size) {
+    printf("\nRichiesta di %d byte \n", size);
     // controllo se i parametri sono validi
     if (!allocator || !allocator->memory || size <= 0 || size > allocator->memory_size) {
         printf("Parametri non validi per la malloc\n");
@@ -100,7 +101,6 @@ void* buddy_allocator_malloc(BuddyAllocator* allocator, int size) {
 
     // aggiungo lo spazio per il buddy block header dove memorizzo l'indice del blocco
     size+=sizeof(int); 
-    printf("\nRichiesta di %d byte\n", size);
 
     // calcolo il livello necessario per la richiesta di memoria
     int level = allocator->num_levels - 1;
@@ -148,6 +148,8 @@ void buddy_allocator_free(BuddyAllocator* allocator, void* ptr){
     int* block_addr = ((int*)ptr-sizeof(int));
     int idx = *block_addr;
 
+    printf("\nRichiesta di deallocazione del blocco di memoria con indice %d\n", idx);
+
     // controllo se l'indice è valido
     if(idx < 0 || idx >= allocator->bitmap.n_bits) {
         printf("ERRORE: indice del blocco di memoria non valido\n");
@@ -171,6 +173,12 @@ void buddy_allocator_free(BuddyAllocator* allocator, void* ptr){
         buddy = buddyIdx(idx);          //calcolo il buddy del padre
     }
     printf("Deallocato con successo il blocco di memoria con indice %d\n", (*block_addr));
+}
+
+void clear_allbits(Bitmap* bitmap) {
+    for(int i=0; i<bitmap->n_bits; i++) {
+        bitmap->bits[i] = 0;
+    }
 }
 
 void buddy_allocator_print(BuddyAllocator* allocator) {
