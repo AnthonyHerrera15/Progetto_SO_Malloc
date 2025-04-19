@@ -7,10 +7,10 @@
 
 #define MEMORY_SIZE 256
 #define MIN_BUCKET_SIZE 16
-#define BUDDY_LEVELS 5
 #define BITMAP_SIZE 32
 
 int main(){
+    
     char memory[MEMORY_SIZE];
     char bitmap_buffer[BITMAP_SIZE];
 
