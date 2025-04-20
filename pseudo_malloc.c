@@ -2,8 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/mman.h>
 
-char memory[MEMORY_SIZE];
+char memory[MEMORY_SIZE]; // memoria gestita dal buddy allocator
 char bitmap_buffer[BITMAP_SIZE];
 BuddyAllocator allocator;
 
@@ -18,7 +19,7 @@ void* pseudo_malloc(int size) {
         printf("ERRORE: dimensione non valida\n");
         return NULL; 
     }
-    if (size < THRESHOLD) {         // Se la dimensione è minore di THRESHOLD, usa il buddy allocator
+    if (size <= THRESHOLD-sizeof(int)) {         // Se la dimensione è minore di THRESHOLD, usa il buddy allocator
         return buddy_allocator_malloc(&allocator, size);
     } else {                        // Altrimenti usa mmap
         void* mem = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
@@ -26,18 +27,18 @@ void* pseudo_malloc(int size) {
             printf("ERRORE: mmap fallito\n");
             return NULL;
         }
-        printf("Allocato %d byte con mmap\n", size);
+        printf("\nAllocato %d byte con mmap\n", size);
         return mem;
     }
 }
 
-//
+// Dealloca un blocco di memoria
 void pseudo_free(void* mem, int size) {
     if (mem == NULL || size <= 0) {
         printf("ERRORE: puntatore nullo o dimensione non valida\n");
         return;
     }
-    if(size < THRESHOLD) {
+    if(size <= THRESHOLD-sizeof(int)) {
         buddy_allocator_free(&allocator, mem);
     } else {
         int res = munmap(mem, size);

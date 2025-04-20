@@ -50,6 +50,8 @@ void buddy_allocator_init(BuddyAllocator* allocator, char* memory, int mem_size,
     while(test_minb_size<<1 <= min_bucket_size){  //trovo la potenza di 2 più vicina a min_bucket_size
         test_minb_size<<=1;
     }
+    printf("test_mem_size: %d\n", test_mem_size);
+    printf("test_minb_size: %d\n", test_minb_size);
     
     int levels = 0;
     int size = test_mem_size;
@@ -57,6 +59,7 @@ void buddy_allocator_init(BuddyAllocator* allocator, char* memory, int mem_size,
         size >>= 1;
         levels++;
     }
+    printf("levels: %d\n", levels);
     if(levels > MAX_LEVELS) {
         printf("ERRORE: numero di livelli non valido\n");
         return;
@@ -68,6 +71,7 @@ void buddy_allocator_init(BuddyAllocator* allocator, char* memory, int mem_size,
     allocator->num_levels = levels;             //pongo num_levels uguale al numero di livelli trovato
 
     int n_bits = (1<<levels)-1;         //numero di bit necessari nella bitmap
+    printf("n_bits: %d\n", n_bits);
     if(n_bits > bm_size) {
         printf("ERRORE: buffer bitmap troppo piccolo\n");
         return;
@@ -191,4 +195,20 @@ void buddy_allocator_print(BuddyAllocator* allocator) {
     printf("Min bucket size: %d\n", allocator->min_bucket_size);
     printf("Num levels: %d\n", allocator->num_levels);
     bitmap_print(&allocator->bitmap);
+}
+
+void buddy_bitmap_print(Bitmap* bitmap, int num_levels) {
+    printf("\n");
+    int idx; 
+    for(int level = 0; level < num_levels; level++) {
+        int nodes_in_level = (1 << level);
+        printf("Livello %d: ", level);
+        for(int i = 0; i < nodes_in_level; i++) {
+            idx = first_in_level(level) + i;
+            if(idx < bitmap->n_bits) {
+                printf("%d ", bitmap_get(bitmap, idx));
+            }
+        }
+        printf("\n");
+    }
 }
