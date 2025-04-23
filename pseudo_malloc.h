@@ -10,4 +10,4 @@
 
 void pseudo_init();
 void* pseudo_malloc(int size);
-void pseudo_free(void* mem, int size);
+void pseudo_free(void* mem);

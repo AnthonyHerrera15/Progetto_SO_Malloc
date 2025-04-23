@@ -5,6 +5,7 @@
 #include "pseudo_malloc.c"
 
 int main(){
+    
     pseudo_init();
     printf("Allocatore inizializzato con successo\n\n");
 
@@ -39,23 +40,25 @@ int main(){
     }
 
     // Test errore di deallocazione con buddy allocator
+    // QUESTI TEST NON SI POSSONO FARE PIÙ DOPO AVER LEVATO DAI PARAMETRI DELLA FREE LA SIZE 
+    /*
     printf("\nTentativo di deallocare un puntatore nullo\n");
     pseudo_free(NULL, 1);
     printf("\nTentativo di deallocare un puntatore non allocato\n");
     pseudo_free(ptr, 1);
     printf("\nTentativo di deallocare un puntatore con dimensione negativa\n");
-    pseudo_free(ptr1, -1);
+    pseudo_free(ptr1, -1);*/
 
     // Test di deallocazioni di piccole allocazioni
     printf("\nTEST DI DEALLOCAZIONE DI PICCOLE DIMENSIONI\n");
 
-    pseudo_free(ptr1, 100);
+    pseudo_free(ptr1);
     buddy_bitmap_print(&allocator.bitmap, allocator.num_levels);
 
-    pseudo_free(ptr2, 512);
+    pseudo_free(ptr2);
     buddy_bitmap_print(&allocator.bitmap, allocator.num_levels);
 
-    pseudo_free(ptr3, 1020);
+    pseudo_free(ptr3);
     buddy_bitmap_print(&allocator.bitmap, allocator.num_levels);
 
     printf("\nDeallocazioni effettuate con successo\n\n");
@@ -77,14 +80,10 @@ int main(){
         buddy_bitmap_print(&allocator.bitmap, allocator.num_levels);
     }
 
-    // Test errore di deallocazione con mmap
-    printf("\nTentativo di deallocare con munmap una zona non allocata con mmap\n");
-    pseudo_free(ptr1, 2000);
-
     // Test di deallocazione di grandi allocazioni
     printf("\nTEST DI DEALLOCAZIONE DI GRANDI DIMENSIONI\n");
-    pseudo_free(ptr4, 2048);
-    pseudo_free(ptr5, 1021);
+    pseudo_free(ptr4);
+    pseudo_free(ptr5);
     printf("Deallocazioni effettuate con successo\n");
 
     return 0;
