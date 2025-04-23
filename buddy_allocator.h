@@ -21,6 +21,7 @@ void* buddy_allocator_malloc(BuddyAllocator* allocator, int size);
 void buddy_allocator_free(BuddyAllocator* allocator, void* ptr);
 
 //funzioni ausiliari (prese dalle slides)
+int levelIdx(int idx);
 int buddyIdx(int idx);
 int parentIdx(int idx);
 int first_in_level(int level);
@@ -28,4 +29,11 @@ int first_in_level(int level);
 //funzioni ausiliari bitmap
 void aggiorno_parenti(Bitmap* bitmap, int idx, int status);
 void aggiorno_figli(Bitmap* bitmap, int idx, int status);
+
+//funzione reset bitmap
+void clear_allbits(Bitmap* bitmap);
+
+//funzione stampa 
+void buddy_allocator_print(BuddyAllocator* allocator);
+void buddy_bitmap_print(Bitmap* bitmap, int num_levels);
 

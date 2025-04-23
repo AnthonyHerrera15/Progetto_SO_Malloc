@@ -78,6 +78,8 @@ int main(){
     }
 
     // Test errore di deallocazione con mmap
+    printf("\nTentativo di deallocare con munmap una zona non allocata con mmap\n");
+    pseudo_free(ptr1, 2000);
 
     // Test di deallocazione di grandi allocazioni
     printf("\nTEST DI DEALLOCAZIONE DI GRANDI DIMENSIONI\n");
