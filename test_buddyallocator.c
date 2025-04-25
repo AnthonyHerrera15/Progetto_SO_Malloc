@@ -3,7 +3,7 @@
 #include <string.h>
 #include <math.h>
 #include <assert.h>
-#include "buddy_allocator.c"
+#include "buddy_allocator.h"
 
 #define MEMORY_SIZE 256
 #define MIN_BUCKET_SIZE 16

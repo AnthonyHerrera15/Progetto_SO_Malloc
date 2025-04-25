@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include "pseudo_malloc.c"
+#include "pseudo_malloc.h"
 
 int main(){
     

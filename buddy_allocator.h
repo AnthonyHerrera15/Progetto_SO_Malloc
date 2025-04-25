@@ -1,5 +1,5 @@
 #pragma once
-#include "bitmap.c"
+#include "bitmap.h"
 
 #define MAX_LEVELS 10
 

@@ -19,7 +19,7 @@ void* pseudo_malloc(int size) {
         printf("ERRORE: dimensione non valida\n");
         return NULL; 
     }
-    if (size <= THRESHOLD-sizeof(int)) {         // Se la dimensione è minore di THRESHOLD, usa il buddy allocator
+    if (size <= THRESHOLD-(int)sizeof(int)) {         // Se la dimensione è minore di THRESHOLD, usa il buddy allocator
         return buddy_allocator_malloc(&allocator, size);
     } else 
     {                                          // Altrimenti usa mmap
